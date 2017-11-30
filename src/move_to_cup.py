@@ -68,7 +68,20 @@ class move_arm(object):
         ik_srv = rospy.ServiceProxy('ExternalTools/left/PositionKinematicsNode/IKService', SolvePositionIK)
         result = ik_srv(pose,[jt_state],0)
         # result = ik_srv(pose,[],0)
-        rospy.loginfo(result)
+        rospy.loginfo(result.joints[0])
+
+        angles = {}
+        i = 0
+        for name in result.joints[0].name:
+            angles[name] = result.joints[0].position[i]
+
+        self.create_plan(angles)
+
+
+    def create_plan(self,angles):
+        self.group.set_joint_value_target(angles)
+        plan = self.group.plan()
+        self.group.execute(plan)
 
 
 

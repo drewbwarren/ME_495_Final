@@ -8,13 +8,23 @@ project(me_495_final)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  actionlib
+  baxter_core_msgs
+  baxter_interface
+  baxter_maintenance_msgs
+  control_msgs
+  cv_bridge
   geometry_msgs
+  roscpp
   rospy
-  std_msgs
+  sensor_msgs
+  trajectory_msgs
+  moveit_core
+  moveit_ros_planning_interface
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost REQUIRED COMPONENTS system filesystem date_time thread)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -47,7 +57,7 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
+#add_message_files(
 #   FILES
 #   Message1.msg
 #   Message2.msg
@@ -105,6 +115,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES me_495_final
+   CATKIN_DEPENDS std_msgs actionlib baxter_core_msgs baxter_interface baxter_maintenance_msgs control_msgs cv_bridge geometry_msgs roscpp rospy sensor_msgs trajectory_msgs
 #  CATKIN_DEPENDS geometry_msgs rospy std_msgs
 #  DEPENDS system_lib
 )

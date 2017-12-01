@@ -50,9 +50,10 @@ import baxter_interface
 import tf
 ## END_SUB_TUTORIAL
 
-from std_msgs.msg import (Header, String)
+from std_msgs.msg import (Header, String, UInt16)
 from geometry_msgs.msg import (PoseStamped, Pose, Point, Quaternion)
 from moveit_msgs.msg import (Constraints, OrientationConstraint)
+from baxter_interface import CHECK_VERSION
 
 from moveit_commander import MoveGroupCommander
 
@@ -66,15 +67,42 @@ class MoveCup():
         #use joint_group parameter to change which arm it uses?
         joint_group = rospy.get_param('~arm', default="left_arm")
         self.group = MoveGroupCommander(joint_group)
-        self.scale_movegroup()
         self.p = PoseStamped()
         self.p.header.frame_id = self.robot.get_planning_frame()
         #remove this when working for realz
         self.display_publisher = rospy.Publisher('/move_group/display_planned_path',moveit_msgs.msg.DisplayTrajectory,queue_size=10)
 
-    def scale_movegroup(self,vel = .5,acc = .9):
+    def scale_movegroup(self,vel = .4,acc = .9):
         self.group.set_max_velocity_scaling_factor(vel)
         self.group.set_max_acceleration_scaling_factor(acc)
+
+    def unscale_movegroup(self):
+        self.group.set_max_velocity_scaling_factor(0)
+        self.group.set_max_acceleration_scaling_factor(0)
+
+    def start_baxter_interface(self):
+        self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
+                                         UInt16, queue_size=10)
+        self._left_arm = baxter_interface.limb.Limb("left")
+        self._left_joint_names = self._left_arm.joint_names()
+        print(self._left_arm.endpoint_pose())
+        self._rs = baxter_interface.RobotEnable(CHECK_VERSION)
+        self._init_state = self._rs.state().enabled
+        print("Enabling robot... ")
+        self._rs.enable()
+
+        # set joint state publishing to 100Hz
+        self._pub_rate.publish(100)
+        return
+
+    def set_neutral(self):
+        """
+       Sets both arms back into a neutral pose.
+       """
+        print("Moving to neutral pose...")
+        self._left_arm.move_to_neutral()
+        print('Is neutral now')
+        return
 
     def set_p(self,x=.05,y=0,z=0,ox=0,oy=0,oz=0,w=1):
         new_p = PoseStamped()
@@ -91,7 +119,19 @@ class MoveCup():
         rospy.spin()
         return(new_p)
 
-    def set_target(self,x=0,y=0,z=0,ox=0,oy=0,oz=0,w=1):
+    def get_end_pose(self):
+        end_pose_dict = self._left_arm.endpoint_pose()
+        end_pose = Pose()
+        end_pose.position = end_pose_dict['position']
+        end_pose.orientation = end_pose_dict['orientation']
+        print('end pose:')
+        print(end_pose)
+        return(end_pose)
+
+    def set_group_start_to_current_pose(self):
+        self.group.set_start_state(self.get_end_pose())
+
+    def set_target(self,x=-.5,y=-.5,z=.6,ox=.6,oy=.4,oz=0,w=0):
         target = PoseStamped()
         target.header.frame_id = self.robot.get_planning_frame()
         target.pose.position.x = x
@@ -106,25 +146,27 @@ class MoveCup():
         return(target)
 
     def move_random(self):
-        self.group.set_start_state_to_current_state()
+        self.set_group_start_to_current_pose()
         randstate = PoseStamped()
         randstate = self.group.get_random_pose()
         self.group.clear_pose_targets()
         self.group.set_pose_target(randstate)
         self.group.set_planning_time(10)
+        self.scale_movegroup()
         self.group.plan()
         self.group.go()
         rospy.spin()
         return
 
     def move_random_constrained(self):
-        self.group.set_start_state_to_current_state()
+        self.set_group_start_to_current_pose()
         randstate = PoseStamped()
         randstate = self.group.get_random_pose()
         self.group.clear_pose_targets()
         self.group.set_pose_target(randstate)
         self.group.set_path_constraints(self.get_constraint())
         self.group.set_planning_time(100)
+        self.scale_movegroup()
         constrained_plan = self.group.plan()
         self.group.execute(constrained_plan)
         rospy.spin()
@@ -132,7 +174,7 @@ class MoveCup():
 
     def move_target(self):
         self.group.clear_pose_targets()
-        self.group.set_start_state_to_current_state()
+        self.set_group_start_to_current_pose()
         self.set_target()
         self.group.set_planning_time(15)
         plan = self.group.plan()
@@ -140,7 +182,18 @@ class MoveCup():
         rospy.spin()
         return
 
-    def get_constraint(self, euler_orientation = [0,0,0], tol = [1,1,1]):
+    def move_target_constrained(self):
+        self.group.clear_pose_targets()
+        self.set_group_start_to_current_pose()
+        self.set_target()
+        self.group.set_path_constraints(self.get_constraint())
+        self.group.set_planning_time(50)
+        plan = self.group.plan()
+        self.group.execute(plan)
+        rospy.spin()
+        return
+
+    def get_constraint(self, euler_orientation = [0,.5,0], tol = [1,1,1]):
         q_orientation = tf.transformations.quaternion_from_euler(euler_orientation[0],euler_orientation[1],euler_orientation[2])
         orientation_msg = Quaternion(q_orientation[0],q_orientation[1],q_orientation[2],q_orientation[3])
 
@@ -164,7 +217,9 @@ if __name__ == '__main__':
     try:
         mover = MoveCup()
         while not rospy.is_shutdown():
-            mover.move_random()
+            mover.start_baxter_interface()
+            mover.set_neutral()
+            mover.move_target_constrained()
             rospy.sleep(10)
     except rospy.ROSInterruptException:
         pass

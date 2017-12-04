@@ -12,6 +12,10 @@ def main():
     angles = limb.joint_angles()
     print angles
 
+    # print the endpoint pose
+    pose = limb.endpoint_pose()
+    print pose
+
 if __name__ == '__main__':
     main()
     try:

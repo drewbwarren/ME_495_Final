@@ -115,7 +115,7 @@ find_package(Boost REQUIRED COMPONENTS system filesystem date_time thread)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES me_495_final
-   CATKIN_DEPENDS std_msgs actionlib baxter_core_msgs baxter_interface baxter_maintenance_msgs control_msgs cv_bridge geometry_msgs roscpp rospy sensor_msgs trajectory_msgs
+   CATKIN_DEPENDS shape_msgs std_msgs actionlib baxter_core_msgs baxter_interface baxter_maintenance_msgs control_msgs cv_bridge geometry_msgs roscpp rospy sensor_msgs trajectory_msgs
 #  CATKIN_DEPENDS geometry_msgs rospy std_msgs
 #  DEPENDS system_lib
 )

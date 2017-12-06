@@ -16,8 +16,10 @@
     <arg name="load_robot_description" value="true"/>
   </include>
 
+
   <include file="$(find baxter_moveit_config)/launch/move_group.launch">
     <arg name="allow_trajectory_execution" value="true"/>
+    <rosparam command="load" file="$(find PACKAGE_NAME)/config/kinematics.yaml"/>
   </include>
 
   <node pkg="me_495_final" type="move_arm.py" name="move_arm">

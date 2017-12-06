@@ -33,3 +33,7 @@ Another main improvement that needs to be made is streamlining this process. Ins
 [scan]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/scan.py
 [move]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/move_to_cup.py
 
+
+[NxR skeleton tracker msg](https://github.com/NxRLab/skeletonmsgs_nu)
+[NxR skeleton tracker lib](https://github.com/NxRLab/skeletontracker_nu)
+[Asus Xtion Driver](https://answers.ros.org/question/109411/asus-xtion-problems-with-ubuntu-1204-running-ros-fuerte/)

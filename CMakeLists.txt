@@ -81,7 +81,6 @@ find_package(Boost REQUIRED COMPONENTS system filesystem date_time thread)
 # generate_messages(
 #   DEPENDENCIES
 #   geometry_msgs#   std_msgs
-# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -134,6 +133,7 @@ include_directories(
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/me_495_final.cpp
+
 # )
 
 ## Add cmake target dependencies of the library
@@ -201,10 +201,7 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_me_495_final.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

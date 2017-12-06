@@ -174,9 +174,9 @@ class MoveCup():
     def project_point(self,multiarray):
         #scales an array and returns a point (see: Pose.position) to be within self.max_reach
         #convert points from sonar ring frame to shoulder frame
-        x = multiarray.data[0] + sr[0] - lls[0]
-        y = multiarray.data[1] + sr[1] - lls[1]
-        z = multiarray.data[2] + sr[2] - lls[2]
+        x = multiarray.data[2] + sr[0] - lls[0]
+        y = multiarray.data[0] + sr[1] - lls[1]
+        z = (-1*multiarray.data[1]) + sr[2] - lls[2]
         #scale point to a finite reach distance from the shoulder
         obj_dist = math.sqrt(x**2 + y**2 + z**2)
         scale_val = min(self.max_reach/obj_dist,.99)

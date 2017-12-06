@@ -24,16 +24,19 @@ class scanner(object):
         # Position2
         start_angles = {'left_w0': -2.316694484903946, 'left_w1': -1.3510535789300782, 'left_w2': -0.11619904468232009, 'left_e0': 0.17640779060682257, 'left_e1': 1.5209419511883877, 'left_s0': -1.4595827196729712, 'left_s1': 0.18484468494019235}
 
+
         self.limb.move_to_joint_positions(start_angles)
         rospy.Subscriber('cup_center',Point,self.cup_cb)
         self.cup = False
         self.gripper.open()
 
     def scan(self):
-        while not rospy.is_shutdown():
-            while not self.cup:
-                scan_vel = {'left_w0': 0.1, 'left_w1': 0.0, 'left_w2': 0.0, 'left_e0': 0.0, 'left_e1': 0.0, 'left_s0': 0.0, 'left_s1': 0.0}
-                self.limb.set_joint_velocities(scan_vel)
+        while not self.cup:
+            def hook():
+                self.cup = True
+            scan_vel = {'left_w0': 0.1, 'left_w1': 0.0, 'left_w2': 0.0, 'left_e0': 0.0, 'left_e1': 0.0, 'left_s0': 0.0, 'left_s1': 0.0}
+            self.limb.set_joint_velocities(scan_vel)
+            rospy.on_shutdown(hook)
 
     def cup_cb(self, point):
         # rospy.loginfo("cup found")

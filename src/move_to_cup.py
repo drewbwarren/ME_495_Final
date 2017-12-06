@@ -3,11 +3,19 @@
 import rospy
 import sys
 import moveit_commander
+import roslaunch
 
 from transforms import so3_to_quat
 import geometry_msgs.msg
+import sensor_msgs.msg
 from moveit_msgs.msg import CollisionObject
 from shape_msgs.msg import SolidPrimitive
+
+from baxter_core_msgs.srv import SolvePositionIK
+import baxter_interface
+
+import tf2_ros
+import tf2_geometry_msgs
 
 class grasping(object):
 
@@ -22,9 +30,10 @@ class grasping(object):
         # IK Service
         self.ik_srv = rospy.ServiceProxy('ExternalTools/left/PositionKinematicsNode/IKService', SolvePositionIK)
 
-        # gripper init
+        # gripper and limb init
         self.gripper = baxter_interface.Gripper('left')
         self.gripper.open()
+        self.limb = baxter_interface.Limb('left')
 
         #################### TF stuff
         self.tf_buffer = tf2_ros.Buffer(rospy.Duration(1200.0)) #tf buffer length
@@ -48,6 +57,14 @@ class grasping(object):
         table.operation = table.ADD
         self.scene.add_box('table',box_pose,size=(.077,.073,.122))
 
+        # start joint trajectory action server
+        # node = roslaunch.core.Node('baxter_interface','joint_trajectory_action_server.py','rsdk_position_w_id_joint_trajectory_action_server',output='screen')
+        # launch = roslaunch.scriptapi.ROSLaunch()
+        # launch.start()
+        # process = launch.launch(node)
+        # print process.is_alive()
+        # rospy.sleep(5)
+
 
 
     def ik_solve(self,pose,seed):
@@ -62,11 +79,13 @@ class grasping(object):
 
 
         i = 0
-        while true:
+        while True:
             result = self.ik_srv([pose],[seed],0)
             i += 1
-            if result.isValid[0] or i==4:
+            if i==4:
                 raise Exception('No IK solution found.')
+                break
+            elif result.isValid[0]:
                 break
 
         angles = {}
@@ -88,7 +107,7 @@ class grasping(object):
         jt_state = sensor_msgs.msg.JointState()
         jt_state.header.stamp = rospy.Time.now()
 
-        angles = limb.joint_angles()
+        angles = self.limb.joint_angles()
         jt_state.name = list(angles.keys())
         jt_state.position = list(angles.values())
         jt_state.header.frame_id = 'base'
@@ -109,7 +128,7 @@ class grasping(object):
                                        rospy.Duration(1.0)) #wait for 1 second
         pose_transformed = tf2_geometry_msgs.do_transform_pose(cup_pose, transform)
 
-        angles = self.ik_solve([pose_transformed],[jt_state])
+        angles = self.ik_solve(pose_transformed,jt_state)
         self.create_plan(angles)
         self.gripper.close()
 
@@ -118,7 +137,8 @@ class grasping(object):
 
 if __name__ == '__main__':
     rospy.init_node('grasp')
-    grasping()
+    t = grasping()
+    t.forward_to_cup()
 
     try:
         rospy.spin()

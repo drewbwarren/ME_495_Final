@@ -11,13 +11,16 @@ import tf
 import math
 ## END_SUB_TUTORIAL
 
-from std_msgs.msg import (Header, String, UInt16)
-from geometry_msgs.msg import (PoseStamped, Pose, Point, Quaternion)
+from std_msgs.msg import (Header, String, UInt16, Int32MultiArray)
+from geometry_msgs.msg import (PoseStamped, Pose, Point, Quaternion, PointStamped)
 from moveit_msgs.msg import (Constraints, OrientationConstraint, CollisionObject)
 from shape_msgs.msg import SolidPrimitive
 from baxter_interface import CHECK_VERSION
 
 from moveit_commander import MoveGroupCommander
+
+lls = [0.102, 0, 0]
+sr = [-0.0347, 0, 0.00953]
 
 class MoveCup():
 
@@ -45,7 +48,7 @@ class MoveCup():
         self.joint_group = rospy.get_param('~arm', default="left_arm")
         self.group = MoveGroupCommander(self.joint_group)
         #this node will scale any tf pose requests to be at most max_reach from the base frame
-        self.max_reach = rospy.get_param('~max_reach', default=1.2)
+        self.max_reach = rospy.get_param('~max_reach', default=1.1)
         #define a start pose that we can move to before stuff runs
         self.start_pose = PoseStamped()
         self.start_pose = self.get_start_pose()
@@ -53,18 +56,19 @@ class MoveCup():
         self.display_publisher = rospy.Publisher('/move_group/display_planned_path',moveit_msgs.msg.DisplayTrajectory,queue_size=10)
         self.rate = rospy.Rate(1)
 
-    def callback(self, targetstamped):
+    def callback(self, targetarray):
         #callback that moves in a constrained path to anything published to /target_poses
         ##First, scale the position to be withing self.max_reach
-        target = targetstamped.pose
-        new_target = self.project_point(target.position)
+        #new_target = self.project_point(targetarray.data)
+        new_target = self.project_point(targetarray)
+        target = Pose()
         target.position = new_target
         #change orientation to be upright
         target.orientation = self.start_pose.pose.orientation
         #clear group info and set it again
         self.group.clear_pose_targets()
         self.group.set_path_constraints(self.get_constraint())
-        self.group.set_planning_time(15)
+        self.group.set_planning_time(10)
         self.group.set_pose_target(target)
         #plan and execute plan. If I find a way, I should add error checking her
         #currently, if the plan fails, it just doesn't move and waits for another pose to be published
@@ -120,14 +124,20 @@ class MoveCup():
         new_p.pose.orientation = p_orient
         return(new_p)
 
-    def project_point(self,point):
-        #scales a Point() (see: Pose.position) to be within self.max_reach
-        obj_dist = math.sqrt(point.x**2 + point.y**2 + point.z**2)
+    def project_point(self,multiarray):
+        #scales an array and returns a point (see: Pose.position) to be within self.max_reach
+        #convert points from sonar ring frame to shoulder frame
+        x = multiarray.data[0] + sr[0] - lls[0]
+        y = multiarray.data[1] + sr[1] - lls[1]
+        z = multiarray.data[2] + sr[2] - lls[2]
+        #scale point to a finite reach distance from the shoulder
+        obj_dist = math.sqrt(x**2 + y**2 + z**2)
         scale_val = min(self.max_reach/obj_dist,.99)
         point_scaled = Point()
-        point_scaled.x = scale_val*point.x
-        point_scaled.y = scale_val * point.y
-        point_scaled.y = scale_val * point.y
+        #scale point and bring into the base frames
+        point_scaled.x = scale_val*x + lls[0]
+        point_scaled.y = scale_val*y + lls[1]
+        point_scaled.z = scale_val*z + lls[2]
         return(point_scaled)
 
     def move_random(self):
@@ -174,7 +184,7 @@ class MoveCup():
         self.rate.sleep()
         return
 
-    def get_constraint(self, euler_orientation = [0,math.pi/2,0], tol = [1,1,1]):
+    def get_constraint(self, euler_orientation = [0,math.pi/2,0], tol = [.5,.5,1]):
         #method takes euler-angle inputs, this converts it to a quaternion
         q_orientation = tf.transformations.quaternion_from_euler(euler_orientation[0],euler_orientation[1],euler_orientation[2])
         orientation_msg = Quaternion(q_orientation[0],q_orientation[1],q_orientation[2],q_orientation[3])
@@ -201,12 +211,12 @@ if __name__ == '__main__':
             #enables the robot
             mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
-            #mover.set_neutral()
-            mover.move_start()
+            mover.set_neutral()
             #slows down the robot path plans
             mover.scale_movegroup()
+            mover.move_start()
             #sets up the subscriber for the callback, currently set to take a pose
-            rospy.Subscriber('target_poses', PoseStamped, mover.callback)
+            rospy.Subscriber('target_poses', Int32MultiArray, mover.callback)
             rospy.spin()
     except rospy.ROSInterruptException:
         pass

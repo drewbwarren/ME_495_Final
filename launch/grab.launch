@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
 
-    <include file="$(find me_495_final)/launch/baxter_moveit_config.launch" />
+    <include file="$(find me_495_final)/launch/moveit_start.launch" />
 
     <node name="jtas" pkg="baxter_interface" type="joint_trajectory_action_server.py" output="screen"/>
 

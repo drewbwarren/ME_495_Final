@@ -7,6 +7,7 @@
 #### [trac_ik](https://bitbucket.org/traclabs/trac_ik.git): Library used for the Trac-IK Plugin for moveit
 * Run the command: sudo apt-get install ros-kinetic-trac-ik
 * Replace the kinematics.yaml file with the one found in ME_495_Final/config/kinematics.yaml
+* As a default, kinematics.yaml is located at ~/($WORKSPACE NAME)/src/moveit_robots/baxter/baxter_moveit_config/config
 
 ### Additions from Drew
 

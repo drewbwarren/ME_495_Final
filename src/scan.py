@@ -3,6 +3,7 @@
 import rospy
 import baxter_interface
 from geometry_msgs.msg import Point
+from std_msgs.msg import Bool
 
 
 ### Orientation of scanning pose
@@ -30,6 +31,9 @@ class scanner(object):
         self.cup = False
         self.gripper.open()
 
+        self.end_pub = rospy.Publisher('cup_found',Bool,queue_size=10)
+        self.end_pub.publish(False)
+
     def scan(self):
         while not self.cup:
             def hook():
@@ -44,6 +48,7 @@ class scanner(object):
         if point.x > 340 and point.x < 3450:
             self.cup = True
             rospy.loginfo('cup found')
+            self.end_pub.publish(True)
 
 
 if __name__=='__main__':

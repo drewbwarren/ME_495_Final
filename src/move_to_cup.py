@@ -10,6 +10,7 @@ import geometry_msgs.msg
 import sensor_msgs.msg
 from moveit_msgs.msg import CollisionObject
 from shape_msgs.msg import SolidPrimitive
+from std_msgs.msg import Bool
 
 from baxter_core_msgs.srv import SolvePositionIK
 import baxter_interface
@@ -65,7 +66,20 @@ class grasping(object):
         # print process.is_alive()
         # rospy.sleep(5)
 
+        self.wait_for_cup()
 
+        self.grab_pub = rospy.Publisher('cup_grabbed',Bool,queue_size=10)
+        self.grab_pub.publish(False)
+
+    def wait_for_cup(self):
+        rospy.Subscriber('cup_found',Bool,self.cup_status_cb)
+        self.wait = True
+        while self.wait:
+            pass
+
+    def cup_status_cb(self,cup_status):
+        if cup_status:
+            self.wait = False
 
     def ik_solve(self,pose,seed):
         # jt_state = sensor_msgs.msg.JointState()
@@ -131,6 +145,7 @@ class grasping(object):
         angles = self.ik_solve(pose_transformed,jt_state)
         self.create_plan(angles)
         self.gripper.close()
+        self.grab_pub.publish(True)
 
     def cupcb(self,pose):
         pass

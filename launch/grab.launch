@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<launch>
+
+    <include file="$(find me_495_final)/launch/baxter_moveit_config.launch" />
+
+    <node name="jtas" pkg="baxter_interface" type="joint_trajectory_action_server.py" output="screen"/>
+
+    <node name="cup_track" pkg="me_495_final" type="track_cup.py"/>
+
+    <node name="scan" pkg="me_495_final" type="scan.py"/>
+
+    <node name="grab" pkg="me_495_final" type="move_to_cup.py"/>
+
+</launch>

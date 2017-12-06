@@ -26,7 +26,7 @@ class grasping(object):
         self.scene = moveit_commander.PlanningSceneInterface()
         self.group = moveit_commander.MoveGroupCommander('left_arm')
         self.group.set_goal_position_tolerance(0.01)
-        self.group.set_max_velocity_scaling_factor(.3)
+        self.group.set_max_velocity_scaling_factor(.2)
 
         # IK Service
         self.ik_srv = rospy.ServiceProxy('ExternalTools/left/PositionKinematicsNode/IKService', SolvePositionIK)
@@ -42,6 +42,7 @@ class grasping(object):
 
         #################### Cup Subscriber
         rospy.Subscriber('cup_center',geometry_msgs.msg.Point,self.cupcb)
+        self.cup_plan = True
 
         ################ Collision Object
         table = CollisionObject()
@@ -73,6 +74,9 @@ class grasping(object):
 
     def wait_for_cup(self):
         rospy.Subscriber('cup_found',Bool,self.cup_status_cb)
+        def hook():
+            self.wait = False
+        rospy.on_shutdown(hook)
         self.wait = True
         while self.wait:
             pass
@@ -117,7 +121,7 @@ class grasping(object):
         plan = self.group.plan()
         self.group.execute(plan)
 
-    def forward_to_cup(self):
+    def forward_to_cup(self,z):
         jt_state = sensor_msgs.msg.JointState()
         jt_state.header.stamp = rospy.Time.now()
 
@@ -131,7 +135,7 @@ class grasping(object):
         cup_pose.header.stamp = rospy.Time.now()
         cup_pose.pose.position.x = 0.0
         cup_pose.pose.position.y = 0.0
-        cup_pose.pose.position.z = .3
+        cup_pose.pose.position.z = z
         cup_pose.pose.orientation.x = 0 #0.2733787988108373
         cup_pose.pose.orientation.y = 0# 0.6514094419398767
         cup_pose.pose.orientation.z = 0 #0.22283432444334322
@@ -144,16 +148,28 @@ class grasping(object):
 
         angles = self.ik_solve(pose_transformed,jt_state)
         self.create_plan(angles)
-        self.gripper.close()
-        self.grab_pub.publish(True)
+        # self.gripper.close()
+        # self.grab_pub.publish(True)
 
-    def cupcb(self,pose):
-        pass
+    def cupcb(self,point):
+        rospy.loginfo(point.z)
+        # if point.z > 0.05 and self.cup_plan:
+        #     self.group.stop()
+        #     rospy.loginfo('\n\nnew plan\n\n')
+        #     self.forward_to_cup(point.z)
+        #     rospy.loginfo(point.z)
+        #     self.cup_plan = False
+        if point.z > 0.0 and point.z < .08:
+            rospy.loginfo('STOP')
+            self.group.stop()
+            self.gripper.close()
+            self.grab_pub.publish(True)
 
 if __name__ == '__main__':
     rospy.init_node('grasp')
+
     t = grasping()
-    t.forward_to_cup()
+    t.forward_to_cup(.45)
 
     try:
         rospy.spin()

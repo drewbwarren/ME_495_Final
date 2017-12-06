@@ -124,7 +124,7 @@ class MoveCup():
         self.rate.sleep()
         return
 
-    def scale_movegroup(self,vel = .4,acc = .9):
+    def scale_movegroup(self,vel = .5,acc = .9):
         #slows down baxters arm so we stop getting all those velocity limit errors
         self.group.set_max_velocity_scaling_factor(vel)
         self.group.set_max_acceleration_scaling_factor(acc)
@@ -259,13 +259,13 @@ if __name__ == '__main__':
         mover = MoveCup()
         while not rospy.is_shutdown():
             #enables the robot
-            mover.start_baxter_interface()
+            #mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
             #mover.set_neutral()
             #slows down the robot path plans
             mover.scale_movegroup()
-            mover.move_start()
-            #sets up the subscriber for the callback, currently set to take a pose
+            #mover.move_start()
+            ##sets up the subscriber for the callback, currently set to take a pose
             rospy.Subscriber('cup_grabbed', Bool, cup_callback)
             rospy.spin()
     except rospy.ROSInterruptException:

@@ -152,7 +152,17 @@ class grasping(object):
         # self.grab_pub.publish(True)
 
     def cupcb(self,point):
+        #rospy.sleep(5)
         rospy.loginfo(point.z)
+
+        # if point.z==0.0 or point.z>0.08
+        #     self.forward_to_cup(.1)
+        # else
+        #     rospy.loginfo('STOP')
+        #     self.group.stop()
+        #     self.gripper.close()
+        #     self.grab_pub.publish(True)
+
         # if point.z > 0.05 and self.cup_plan:
         #     self.group.stop()
         #     rospy.loginfo('\n\nnew plan\n\n')
@@ -160,13 +170,14 @@ class grasping(object):
         #     rospy.loginfo(point.z)
         #     self.cup_plan = False
         if point.z > 0.0 and point.z < .08:
-            rospy.loginfo('STOP')
-            self.group.stop()
-            self.gripper.close()
-            self.grab_pub.publish(True)
+           rospy.loginfo('STOP')
+           self.group.stop()
+           self.gripper.close()
+           self.grab_pub.publish(True)
 
 if __name__ == '__main__':
     rospy.init_node('grasp')
+
 
     t = grasping()
     t.forward_to_cup(.45)

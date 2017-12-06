@@ -17,3 +17,10 @@ We have a "working" system for grasping the cup. To grab the cup, follow these s
 
 Another main improvement that needs to be made is streamlining this process. Instead of needing to start each node manually, let's figure out how to do it all at once. This will involve launch files for some of it. One challenge is figuring out how to start and stop the joint trajectory action server when needed. I will be working on that. Another challenge is to figure out how to signal from one node to another when a task is finished and when the next task should start.
 
+
+
+[config]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/launch/baxter_moveit_config.launch
+[track]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/track_cup.py
+[scan]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/scan.py
+[move]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/move_to_cup.py
+

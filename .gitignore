@@ -45,3 +45,11 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+grasp_moveit.launch
+moveit_test.py
+good_moveit_test.py
+baxter_world.launch
+.world
+world
+

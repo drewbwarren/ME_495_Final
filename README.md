@@ -3,6 +3,10 @@
 ### Installations
 
 #### Follow the instructions to install moveit! here: [moveit! for Baxter](http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial)
+* For kinetic users, the command is: sudo apt-get install ros-kinetic-moveit
+
+#### Install a bug fix for Moveit
+* Run: sudo apt-get install python-pyassimp
 
 #### [trac_ik](https://bitbucket.org/traclabs/trac_ik.git): Library used for the Trac-IK Plugin for moveit
 * Run the command: sudo apt-get install ros-kinetic-trac-ik

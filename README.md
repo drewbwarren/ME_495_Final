@@ -1,5 +1,13 @@
 # ME_495_Final
 
+### Installations
+
+#### Follow the instructions to install moveit! here: [moveit! for Baxter](http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial)
+
+#### [trac_ik](https://bitbucket.org/traclabs/trac_ik.git): Library used for the Trac-IK Plugin for moveit
+* Run the command: sudo apt-get install ros-kinetic-trac-ik
+* Replace the kinematics.yaml file with the one found in ME_495_Final/config/kinematics.yaml
+
 ### Additions from Drew
 
 `grasp.py` is a very simple node to control the joint positions of Baxter's left arm. Starting from rest, the arm moves to three intermediate positions before moving to a plausible grasping position above the table. A better approach would be to use the `moveit_commander` to plan a path to the position of the cup and avoid the known obstacle of the table. I will try to do that next.

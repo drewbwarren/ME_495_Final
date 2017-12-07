@@ -49,7 +49,6 @@ class MoveCup():
         self.joint_group = rospy.get_param('~arm', default="left_arm")
         self.group = MoveGroupCommander(self.joint_group)
         #self.group.set_planner_id("BKPIECEkConfigDefault")
-        self.group.allow_replanning(1)
         #this node will scale any tf pose requests to be at most max_reach from the base frame
         self.max_reach = rospy.get_param('~max_reach', default=1.1)
         #define a start pose that we can move to before stuff runs
@@ -124,7 +123,7 @@ class MoveCup():
         self.rate.sleep()
         return
 
-    def scale_movegroup(self,vel = .4,acc = .9):
+    def scale_movegroup(self,vel = .9,acc = .9):
         #slows down baxters arm so we stop getting all those velocity limit errors
         self.group.set_max_velocity_scaling_factor(vel)
         self.group.set_max_acceleration_scaling_factor(acc)
@@ -193,7 +192,7 @@ class MoveCup():
         randstate = self.group.get_random_pose()
         self.group.clear_pose_targets()
         self.group.set_pose_target(randstate)
-        self.group.set_planning_time(10)
+        self.group.set_planning_time(8)
         self.scale_movegroup()
         plan = self.group.plan()
         while len(plan.joint_trajectory.points) == 1 and not rospy.is_shutdown():
@@ -231,7 +230,7 @@ class MoveCup():
         self.rate.sleep()
         return
 
-    def get_constraint(self, euler_orientation = [0,math.pi/2,0], tol = [.9,.9,3]):
+    def get_constraint(self, euler_orientation = [0,math.pi/2,0], tol = [3,3,.5]):
         #method takes euler-angle inputs, this converts it to a quaternion
         q_orientation = tf.transformations.quaternion_from_euler(euler_orientation[0],euler_orientation[1],euler_orientation[2])
         orientation_msg = Quaternion(q_orientation[0],q_orientation[1],q_orientation[2],q_orientation[3])
@@ -253,7 +252,8 @@ def cup_callback(grabbedness):
     if grabbedness:
         #slows down the robot path plan        
         mover.scale_movegroup()
-        rospy.Subscriber('target_poses', Float32MultiArray, mover.callback)
+        move.move_start()
+        rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
 
 
 if __name__ == '__main__':
@@ -267,7 +267,7 @@ if __name__ == '__main__':
 
             #mover.move_start()
             #sets up the subscriber for the callback, currently set to take a pose
-            rospy.Subscriber('cup_grabbed', Bool, cup_callback)
+            rospy.Subscriber('cup_grabbed', Bool, cup_callback,queue_size=1)
             rospy.spin()
     except rospy.ROSInterruptException:
         pass

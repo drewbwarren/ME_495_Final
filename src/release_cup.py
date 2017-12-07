@@ -31,7 +31,7 @@ def main():
     rs.enable()
     rospy.Subscriber("/robot/limb/left/endpoint_state", EndpointState, get_present_state,left, queue_size=1)
     gripper_pub = rospy.Publisher('cup_taken',Bool,queue_size=10)
-    gripper_pub.publish(False)
+
 
     done=False
     while not done and not rospy.is_shutdown():

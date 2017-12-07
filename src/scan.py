@@ -35,6 +35,7 @@ class scanner(object):
         rospy.Subscriber('cup_center',Point,self.cup_cb)
         self.cup = False
         self.gripper.open()
+        rospy.loginfo('gripper open')
 
         self.end_pub = rospy.Publisher('cup_found',Bool,queue_size=10)
         self.end_pub.publish(False)
@@ -49,10 +50,10 @@ class scanner(object):
 
     def cup_cb(self, point):
         # rospy.loginfo("cup found")
-        # rospy.loginfo(point)
-        if point.x > 350 and point.x < 360:
+        # rospy.loginfo(point.x)
+        if point.x > 640 and point.x < 677:
             self.cup = True
-            rospy.loginfo('cup found')
+            # rospy.loginfo('\n\ncup found\n\n')
             self.end_pub.publish(True)
 
 

@@ -77,7 +77,7 @@ class image_converter:
 #    if cols > 60 and rows > 60 :
 #      cv2.circle(cv_image, (50,50), 10, 255)
 
-    cv2.imshow("Image window", cv_image)
+    # cv2.imshow("Image window", cv_image)
     # cv2.imshow("ROI show", res)
 
     rospy.Subscriber("/robot/range/left_hand_range/state", Range, self.depth)

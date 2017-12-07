@@ -33,8 +33,7 @@ class SkeletonController:
                                          self.skelcb)
         self.count= 0
         self.running_flag = False
-
-        self.pos_pub = rospy.Publisher('target_poses',Float32MultiArray,queue_size=10)
+        self.pos_pub = rospy.Publisher('target_poses',Float32MultiArray,queue_size=1)
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -71,7 +70,8 @@ class SkeletonController:
         trans = Float32MultiArray()
         trans.data = [self.x,self.y,self.z]
         self.pos_pub.publish(trans)
-
+        rospy.loginfo(trans)
+       # rospy.sleep(0.5)
 
     def get_key_user(self, skels):
         data = []
@@ -98,15 +98,22 @@ class SkeletonController:
 
 
 def main():
-    rospy.init_node('skeleton_interface')#, log_level=rospy.INFO)
-    handPub = rospy.Publisher('handPosition',Int32,queue_size = 1)
+    rospy.init_node('skeleton_filter')#, log_level=rospy.INFO)
+   
+    # rate = rospy.Rate(1)
+    
+    # while not rospy.is_shutdown():
+    #     sim = SkeletonController()
+    #     rate.sleep()
 
     try:
-        sim = SkeletonController()
-        x = sim.x
+         sim = SkeletonController()
+         x = sim.x
     except rospy.ROSInterruptException: pass
 
     rospy.spin()
+
+    
 
 
 if __name__=='__main__':

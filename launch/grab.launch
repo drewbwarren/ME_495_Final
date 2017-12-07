@@ -1,14 +1,23 @@
 <?xml version="1.0" ?>
 <launch>
 
+	<param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
+
     <include file="$(find me_495_final)/launch/moveit_start.launch" />
+    <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
+    <!-- include file="$(find skeletontracker_nu)/launch/nu_skeletontracker.launch" /-->
 
     <node name="jtas" pkg="baxter_interface" type="joint_trajectory_action_server.py" output="screen"/>
+    <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
+	<node name="skeleton_filter" pkg="me_495_final" type="filterV2.py" />
 
     <node name="cup_track" pkg="me_495_final" type="track_cup.py"/>
+    <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
 
-    <node name="scan" pkg="me_495_final" type="scan.py"/>
+    <node name="scan" pkg="me_495_final" type="scan.py" output="screen"/>
+    <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
 
-    <node name="grab" pkg="me_495_final" type="move_to_cup.py"/>
+    <node name="grab" pkg="me_495_final" type="move_to_cup.py" output="screen"/>
+    <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
 
 </launch>

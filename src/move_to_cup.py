@@ -79,7 +79,9 @@ class grasping(object):
         rospy.on_shutdown(hook)
         self.wait = True
         while self.wait:
-            pass
+            i = 0
+            
+        rospy.loginfo('done waiting')
 
     def cup_status_cb(self,cup_status):
         if cup_status:
@@ -151,9 +153,11 @@ class grasping(object):
         # self.gripper.close()
         # self.grab_pub.publish(True)
 
+    def done(self):
+        self.grab_pub.publish(True)
+
     def cupcb(self,point):
-        #rospy.sleep(5)
-        rospy.loginfo(point.z)
+        # rospy.loginfo(point.z)
 
         # if point.z==0.0 or point.z>0.08
         #     self.forward_to_cup(.1)
@@ -170,17 +174,17 @@ class grasping(object):
         #     rospy.loginfo(point.z)
         #     self.cup_plan = False
         if point.z > 0.0 and point.z < .08:
-           rospy.loginfo('STOP')
-           self.group.stop()
+           # rospy.loginfo('STOP')
+           # self.group.stop()
            self.gripper.close()
-           self.grab_pub.publish(True)
+           self.done()
 
 if __name__ == '__main__':
     rospy.init_node('grasp')
 
 
     t = grasping()
-    t.forward_to_cup(.45)
+    t.forward_to_cup(.37)
 
     try:
         rospy.spin()

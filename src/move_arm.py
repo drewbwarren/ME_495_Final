@@ -104,14 +104,6 @@ class MoveCup():
         self.rate.sleep()
         return
 
-    def release_callback(self):
-        target_sub.unsubscribe()
-        release_sub.unsubscribe()
-        self.gripper = baxter_interface.Gripper('left')
-        self.gripper.open()
-        self.move_start()
-        rospy.spin()
-
     def scale_movegroup(self,vel = .9,acc = .9):
         #slows down baxters arm so we stop getting all those velocity limit errors
         self.group.set_max_velocity_scaling_factor(vel)
@@ -123,8 +115,6 @@ class MoveCup():
 
     def start_baxter_interface(self):
         #can enable the robot when running this node alone
-        self._left_joint_names = self._left_arm.joint_names()
-        print(self._left_arm.endpoint_pose())
         self._rs = baxter_interface.RobotEnable(CHECK_VERSION)
         self._init_state = self._rs.state().enabled
         print("Enabling robot... ")
@@ -190,32 +180,45 @@ class MoveCup():
         constraint.orientation_constraints.append(upright_orientation)
         return(constraint)
 
+    def init_sub(self):
+        self.target_sub = rospy.Subscriber('target_poses', Float32MultiArray, self.callback,queue_size=1)
+
+    def done(self):
+        self.gripper = baxter_interface.Gripper('left')
+        self.gripper.open()
+        self.move_start()
+        return
+
 def cup_callback(grabbedness):
-    
     if grabbedness and flag:
         #slows down the robot path plan
         Flag = False
         rospy.loginfo('ready for orientation plan')      
         mover.scale_movegroup()
         mover.move_start()
-        target_sub = rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
-        release_sub = rospy.Subscriber('cup_taken', Bool, mover.release_callback, queue_size = 1)
+        mover.init_sub()
         sub.unregister()
         return
 
+def release_callback(dummy):
+    release_sub.unregister()
+    mover.target_sub.unregister()
+    mover.done()
+    #rospy.spin()
 
 if __name__ == '__main__':
     try:
         mover = MoveCup()
         while not rospy.is_shutdown():
             #enables the robot
-            #mover.start_baxter_interface()
+            mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
             #mover.set_neutral()
 
             #mover.move_start()
             #sets up the subscriber for the callback, currently set to take a pose
             sub = rospy.Subscriber('cup_grabbed', Bool, cup_callback,queue_size=1)
+            release_sub = rospy.Subscriber('cup_taken', Bool, release_callback, queue_size = 1)
             rospy.spin()
     except rospy.ROSInterruptException:
         pass

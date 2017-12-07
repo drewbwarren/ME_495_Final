@@ -34,7 +34,7 @@ class SkeletonController:
         self.count= 0
         self.running_flag = False
 
-        self.pos_pub = rospy.Publisher('target_poses',Float32MultiArray,queue_size=10)
+        self.pos_pub = rospy.Publisher('target_poses',Float32MultiArray,queue_size=1)
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0

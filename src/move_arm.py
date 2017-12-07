@@ -211,7 +211,7 @@ if __name__ == '__main__':
         mover = MoveCup()
         while not rospy.is_shutdown():
             #enables the robot
-            mover.start_baxter_interface()
+            #mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
             #mover.set_neutral()
 

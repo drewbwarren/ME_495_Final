@@ -275,8 +275,6 @@ if __name__ == '__main__':
             mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
             #mover.set_neutral()
-
-            mover.move_start()
             #sets up the subscriber for the callback, currently set to take a pose
             rospy.Subscriber('cup_grabbed', Bool, cup_callback,queue_size=1)
             rospy.spin()

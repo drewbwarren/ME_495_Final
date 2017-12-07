@@ -9,14 +9,6 @@
   <arg name="debug" default="false"/>
   <arg name="config" default="true"/>
 
-
-<!--  <node pkg="baxter_interface" type="joint_trajectory_action_server.py" name="joint_traj_action_srv" output="screen" />
-
-  <!-- Setup the grippers:
-  <node pkg="me_495_final" type="add_willens_grippers.sh" name="gripper_modifier" output="screen" respawn="false" />
-  <node pkg="me_495_final" type="add_willens_grippers.sh" name="gripper_modifier" output="screen" respawn="false" />-->
-
-
   <include file="$(find baxter_moveit_config)/launch/planning_context.launch">
     <arg name="load_robot_description" value="true"/>
   </include>

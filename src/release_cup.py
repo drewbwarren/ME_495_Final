@@ -13,7 +13,7 @@ from baxter_interface import CHECK_VERSION
 
 def get_present_state(data,left):
     y = data.wrench.force.y
-    if y<-3:
+    if y<-2:
         left.open()
         gripper_pub.publish(True)
 
@@ -22,7 +22,7 @@ def get_present_state(data,left):
 
 def main():
 
-    rospy.init_node("rsdk_gripper_keyboard")
+    rospy.init_node("release_cup")
 
     rs = baxter_interface.RobotEnable(CHECK_VERSION)
     init_state = rs.state().enabled

@@ -49,7 +49,7 @@ class MoveCup():
         #use joint_group parameter to change which arm it uses?
         self.joint_group = rospy.get_param('~arm', default="left_arm")
         self.group = MoveGroupCommander(self.joint_group)
-        self.group.set_planner_id("LBKPIECEkConfigDefault")
+        #self.group.set_planner_id("LBKPIECEkConfigDefault")
         #this node will scale any tf pose requests to be at most max_reach from the base frame
         self.max_reach = rospy.get_param('~max_reach', default=.7)
         #define a start pose that we can move to before stuff runs
@@ -207,7 +207,9 @@ class MoveCup():
         #move baxter to a random position with constrained path planning.  also for testing
         self.scale_movegroup()
         randstate = PoseStamped()
-        randstate = self.group.get_random_pose()
+​
+271
+            mover.move_start()        randstate = self.group.get_random_pose()
         self.group.clear_pose_targets()
         self.group.set_pose_target(randstate)
         self.group.set_path_constraints(self.get_constraint())
@@ -264,11 +266,11 @@ if __name__ == '__main__':
         mover = MoveCup()
         while not rospy.is_shutdown():
             #enables the robot
-            mover.start_baxter_interface()
+            #mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
             #mover.set_neutral()
 
-            mover.move_start()
+            #mover.move_start()
             #sets up the subscriber for the callback, currently set to take a pose
             rospy.Subscriber('cup_grabbed', Bool, cup_callback,queue_size=1)
             rospy.spin()

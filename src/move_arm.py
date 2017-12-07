@@ -252,7 +252,7 @@ def cup_callback(grabbedness):
     if grabbedness:
         #slows down the robot path plan        
         mover.scale_movegroup()
-        move.move_start()
+        mover.move_start()
         rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
 
 

@@ -22,7 +22,7 @@ from moveit_commander import MoveGroupCommander
 #translations from the world frame to the left shoulder and sonar ring (or .03 above the sonar ring)
 lls = [0.064, 0.259, 0.130]
 sr = [0.095, 0, 0.82]
-start_pose = [.9, 0.2 ,0.82]
+start_pose = [.9, 0.2 ,0.130]
 
 class MoveCup():
 

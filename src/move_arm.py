@@ -22,6 +22,7 @@ from moveit_commander import MoveGroupCommander
 #translations from the world frame to the left shoulder and sonar ring (or .03 above the sonar ring)
 lls = [0.064, 0.259, 0.130]
 sr = [0.095, 0, 0.82]
+start_pose = [.9, 0.2 ,0.82]
 
 class MoveCup():
 
@@ -48,9 +49,9 @@ class MoveCup():
         #use joint_group parameter to change which arm it uses?
         self.joint_group = rospy.get_param('~arm', default="left_arm")
         self.group = MoveGroupCommander(self.joint_group)
-        #self.group.set_planner_id("BKPIECEkConfigDefault")
+        self.group.set_planner_id("LBKPIECEkConfigDefault")
         #this node will scale any tf pose requests to be at most max_reach from the base frame
-        self.max_reach = rospy.get_param('~max_reach', default=1.1)
+        self.max_reach = rospy.get_param('~max_reach', default=.7)
         #define a start pose that we can move to before stuff runs
         self.start_pose = PoseStamped()
         self.start_pose = self.get_start_pose()
@@ -76,7 +77,7 @@ class MoveCup():
         #currently, if the plan fails, it just doesn't move and waits for another pose to be published
         plan = self.group.plan()
         self.group.execute(plan)
-        self.rate.sleep()
+        rospy.spin()
         return
 
     def callback_tester(self, targetarray):
@@ -157,7 +158,7 @@ class MoveCup():
         print('Is neutral now')
         return
 
-    def get_start_pose(self,point=[.9, 0.2, 0],rpy=[0, math.pi/2, 0]):
+    def get_start_pose(self,point=start_pose,rpy=[0, math.pi/2, 0]):
         #define a starting position for the move_start method
         new_p = PoseStamped()
         new_p.header.frame_id = self.robot.get_planning_frame()
@@ -173,17 +174,17 @@ class MoveCup():
     def project_point(self,multiarray):
         #scales an array and returns a point (see: Pose.position) to be within self.max_reach
         #convert points from sonar ring frame to shoulder frame
-        x = multiarray.data[2] + sr[0] - lls[0]
-        y = multiarray.data[0] + sr[1] - lls[1]
-        z = (-1*multiarray.data[1]) + sr[2] - lls[2]
+        x = multiarray.data[2] + sr[0] - start_pose[0]
+        y = multiarray.data[0] + sr[1] - start_pose[1]
+        z = (-1*multiarray.data[1]) + sr[2] - start_pose[2]
         #scale point to a finite reach distance from the shoulder
         obj_dist = math.sqrt(x**2 + y**2 + z**2)
         scale_val = min(self.max_reach/obj_dist,.99)
         point_scaled = Point()
         #scale point and bring into the base frames
-        point_scaled.x = scale_val*x + lls[0]
-        point_scaled.y = scale_val*y + lls[1]
-        point_scaled.z = scale_val*z + lls[2]
+        point_scaled.x = scale_val*x + start_pose[0]
+        point_scaled.y = scale_val*y + start_pose[1]
+        point_scaled.z = scale_val*z + start_pose[2]
         return(point_scaled)
 
     def move_random(self):
@@ -230,7 +231,7 @@ class MoveCup():
         self.rate.sleep()
         return
 
-    def get_constraint(self, euler_orientation = [0,math.pi/2,0], tol = [3,3,.5]):
+    def get_constraint(self, euler_orientation = [0,math.pi/2,0], tol = [3,3,.3]):
         #method takes euler-angle inputs, this converts it to a quaternion
         q_orientation = tf.transformations.quaternion_from_euler(euler_orientation[0],euler_orientation[1],euler_orientation[2])
         orientation_msg = Quaternion(q_orientation[0],q_orientation[1],q_orientation[2],q_orientation[3])
@@ -249,11 +250,13 @@ class MoveCup():
         return(constraint)
 
 def cup_callback(grabbedness):
-    if grabbedness:
+    has_run = 0
+    if grabbedness and not has_run:
         #slows down the robot path plan        
         mover.scale_movegroup()
         mover.move_start()
         rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
+        has_run = 1;
 
 
 if __name__ == '__main__':
@@ -261,11 +264,11 @@ if __name__ == '__main__':
         mover = MoveCup()
         while not rospy.is_shutdown():
             #enables the robot
-            #mover.start_baxter_interface()
+            mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
             #mover.set_neutral()
 
-            #mover.move_start()
+            mover.move_start()
             #sets up the subscriber for the callback, currently set to take a pose
             rospy.Subscriber('cup_grabbed', Bool, cup_callback,queue_size=1)
             rospy.spin()

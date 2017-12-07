@@ -104,49 +104,13 @@ class MoveCup():
         self.rate.sleep()
         return
 
-    def callback_tester(self, targetarray):
-        #callback that moves in a constrained path to anything published to /target_poses
-        ##First, scale the position to be withing self.max_reach
-        #new_target = self.project_point(targetarray.data)
-        targetarray2 = targetarray
-        targetarray3 = targetarray
-        targetarray2.data = (targetarray.data[0]+.1,targetarray.data[1]+.1,targetarray.data[2]+.1)
-        targetarray3.data = (targetarray.data[0]+.15,targetarray.data[1]-.1,targetarray.data[2]-.1)
-        new_target = self.project_point(targetarray)
-        new_target2 = self.project_point(targetarray2)
-        new_target3 = self.project_point(targetarray3)
-        target = Pose()
-        target2 = Pose()
-        target3 = Pose()
-        target.position = new_target
-        target2.position = new_target2
-        target3.position = new_target3
-        #change orientation to be upright
-        target.orientation = self.start_pose.pose.orientation
-        #clear group info and set it again
-        self.group.clear_pose_targets()
-        self.group.set_path_constraints(self.get_constraint())
-        self.group.set_planning_time(10)
-        self.group.set_pose_target(target)
-        #plan and execute plan. If I find a way, I should add error checking her
-        #currently, if the plan fails, it just doesn't move and waits for another pose to be published
-        plan = self.group.plan()
-        self.group.set_pose_target(target2)
-        self.group.clear_path_constraints()
-        self.group.set_path_constraints(self.get_constraint())
-        plan2 = self.group.plan()
-        self.group.clear_path_constraints()
-        self.group.set_path_constraints(self.get_constraint())
-        self.group.set_pose_target(target3)
-        plan3 = self.group.plan()
-        self.group.execute(plan)
+    def release_callback(self):
+        target_sub.unsubscribe()
+        release_sub.unsubscribe()
+        self.gripper = baxter_interface.Gripper('left')
+        self.gripper.open()
         self.move_start()
-        self.group.execute(plan2)
-        self.move_start()
-        self.group.execute(plan3)
-        self.move_start()
-        self.rate.sleep()
-        return
+        rospy.spin()
 
     def scale_movegroup(self,vel = .9,acc = .9):
         #slows down baxters arm so we stop getting all those velocity limit errors
@@ -158,28 +122,13 @@ class MoveCup():
         self.group.set_max_acceleration_scaling_factor(1)
 
     def start_baxter_interface(self):
-        #I copied this from an example but have no idea what it does
-        self._pub_rate = rospy.Publisher('robot/joint_state_publish_rate',
-                                         UInt16, queue_size=10)
-        self._left_arm = baxter_interface.limb.Limb("left")
+        #can enable the robot when running this node alone
         self._left_joint_names = self._left_arm.joint_names()
         print(self._left_arm.endpoint_pose())
         self._rs = baxter_interface.RobotEnable(CHECK_VERSION)
         self._init_state = self._rs.state().enabled
         print("Enabling robot... ")
         self._rs.enable()
-
-        # set joint state publishing to 100Hz
-        self._pub_rate.publish(100)
-        return
-
-    def set_neutral(self):
-        """
-       Sets both arms back into a neutral pose.
-       """
-        print("Moving to neutral pose...")
-        self._left_arm.move_to_neutral()
-        print('Is neutral now')
         return
 
     def get_start_pose(self,point=[.9, 0.2, 0],rpy=[0, math.pi/2, 0]):
@@ -210,38 +159,6 @@ class MoveCup():
         point_scaled.y = scale_val*y + lls[1]
         point_scaled.z = scale_val*z + lls[2]
         return(point_scaled)
-
-    def move_random(self):
-        #moves baxter to a random position.  used for testing
-        randstate = PoseStamped()
-        randstate = self.group.get_random_pose()
-        self.group.clear_pose_targets()
-        self.group.set_pose_target(randstate)
-        self.group.set_planning_time(8)
-        self.scale_movegroup()
-        plan = self.group.plan()
-        while len(plan.joint_trajectory.points) == 1 and not rospy.is_shutdown():
-            print('plan no work')
-            plan = self.group.plan()
-        self.group.execute(plan)
-        self.rate.sleep()
-        return
-
-    def move_random_constrained(self):
-        #move baxter to a random position with constrained path planning.  also for testing
-        self.scale_movegroup()
-        randstate = PoseStamped()
-        randstate = self.group.get_random_pose()
-        self.group.clear_pose_targets()
-        self.group.set_pose_target(randstate)
-        self.group.set_path_constraints(self.get_constraint())
-        self.group.set_planning_time(100)
-        self.scale_movegroup()
-        constrained_plan = self.group.plan()
-        self.group.execute(constrained_plan)
-        self.unscale_movegroup()
-        rospy.sleep(3)
-        return
 
     def move_start(self):
         #move baxter to the self.start_pose pose
@@ -281,7 +198,8 @@ def cup_callback(grabbedness):
         rospy.loginfo('ready for orientation plan')      
         mover.scale_movegroup()
         mover.move_start()
-        rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
+        target_sub = rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
+        release_sub = rospy.Subscriber('cup_taken', Bool, mover.release_callback, queue_size = 1)
         sub.unregister()
         return
 

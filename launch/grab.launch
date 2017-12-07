@@ -3,6 +3,8 @@
 
     <include file="$(find me_495_final)/launch/moveit_start.launch" />
 
+    <node pkg="topic_tools" type="relay" name="relay_joint_states" args="/robot/joint_states /joint_states" />
+    
     <node name="jtas" pkg="baxter_interface" type="joint_trajectory_action_server.py" output="screen"/>
 
     <node name="cup_track" pkg="me_495_final" type="track_cup.py"/>

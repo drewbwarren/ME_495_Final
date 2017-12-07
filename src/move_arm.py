@@ -259,12 +259,17 @@ class MoveCup():
 
 def cup_callback(grabbedness):
     has_run = 0
+    if grabbedness is False:
+        return
     if grabbedness and has_run==0:
         #slows down the robot path plan        
         mover.scale_movegroup()
         mover.move_start()
         rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
         has_run = 1;
+        sub.unregister()
+        return
+
 
 
 if __name__ == '__main__':
@@ -272,11 +277,11 @@ if __name__ == '__main__':
         mover = MoveCup()
         while not rospy.is_shutdown():
             #enables the robot
-            mover.start_baxter_interface()
+            #mover.start_baxter_interface()
             #moves the robot to a starting pose that makes future moves fail less
             #mover.set_neutral()
             #sets up the subscriber for the callback, currently set to take a pose
-            rospy.Subscriber('cup_grabbed', Bool, cup_callback,queue_size=1)
+            sub = rospy.Subscriber('cup_grabbed', Bool,cup_callback, queue_size=1)
             rospy.spin()
     except rospy.ROSInterruptException:
         pass

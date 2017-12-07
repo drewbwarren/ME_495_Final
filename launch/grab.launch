@@ -7,6 +7,8 @@
     <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
     <!-- include file="$(find skeletontracker_nu)/launch/nu_skeletontracker.launch" /-->
 
+    <node pkg="topic_tools" type="relay" name="relay_joint_states" args="/robot/joint_states /joint_states" />
+    
     <node name="jtas" pkg="baxter_interface" type="joint_trajectory_action_server.py" output="screen"/>
     <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
 	<node name="skeleton_filter" pkg="me_495_final" type="filterV2.py" />

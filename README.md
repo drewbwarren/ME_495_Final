@@ -1,5 +1,8 @@
 # ME_495_Final
 
+### Members: 
+##### Suhail Sulaiman, Drew Warren, Andrew Wentzel, Zidong (Tom) Xiao, Kaiyang (Kevin) Zheng
+
 ### Installations
 
 #### Follow the instructions to install moveit! here: [moveit! for Baxter](http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial)

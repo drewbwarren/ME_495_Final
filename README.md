@@ -58,12 +58,13 @@
 
         Another main improvement that needs to be made is streamlining this process. Instead of needing to start each node manually, let's figure out how to do it all at once. This will involve launch files for some of it. One challenge is figuring out how to start and stop the joint trajectory action server when needed. I will be working on that. Another challenge is to figure out how to signal from one node to another when a task is finished and when the next task should start.
 
-[config]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/launch/baxter_moveit_config.launch
-[track]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/track_cup.py
-[scan]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/scan.py
-[move]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/move_to_cup.py
+        [config]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/launch/baxter_moveit_config.launch
+        [track]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/track_cup.py
+        [scan]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/scan.py
+        [move]:https://github.com/tehwentzel/ME_495_Final/blob/grasp/src/move_to_cup.py
 
+### More Resources
 
-[NxR skeleton tracker msg](https://github.com/NxRLab/skeletonmsgs_nu)
-[NxR skeleton tracker lib](https://github.com/NxRLab/skeletontracker_nu)
-[Asus Xtion Driver](https://answers.ros.org/question/109411/asus-xtion-problems-with-ubuntu-1204-running-ros-fuerte/)
+#### Anyone interested in constrained planning in moveit might be interested in looking into [using OMPL create an Approximation Manifold For Path Planning](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/constraints_approximation_database.html).  THis allows you to calculate and approximated sub-space of valid states to plan on for a set of constraints that is created when the node is run.  Requires using C++
+
+#### An ongoing area of development in moveit is integrating [CHOMP](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/chomp_interface_tutorial.html) with Moveit.  CHOMP Uses optimization based path planning.  Using alternative path planning algorithms that allow a cost function based on the distance offset from the desired pose at any point would likely prove a better alternative to naive path planning or the default method of constrained planning used in Moveit.

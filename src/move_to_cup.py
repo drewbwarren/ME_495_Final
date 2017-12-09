@@ -173,7 +173,7 @@ class grasping(object):
         #     self.forward_to_cup(point.z)
         #     rospy.loginfo(point.z)
         #     self.cup_plan = False
-        if point.z > 0.0 and point.z < .08:
+        if point.z > 0.0 and point.z < .09:
            # rospy.loginfo('STOP')
            # self.group.stop()
            self.gripper.close()

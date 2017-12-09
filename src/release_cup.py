@@ -13,7 +13,7 @@ from baxter_interface import CHECK_VERSION
 
 def get_present_state(data,left):
     y = data.wrench.force.y
-    if y<-2:
+    if y<2:
         left.open()
         gripper_pub.publish(True)
 

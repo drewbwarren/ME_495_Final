@@ -64,45 +64,61 @@ class MoveCup():
         self.rate = rospy.Rate(1)
         self.ik_srv = rospy.ServiceProxy('ExternalTools/left/PositionKinematicsNode/IKService', SolvePositionIK)
         self.limb = baxter_interface.Limb('left')
+        self.rangesub = rospy.Subscriber('cup_center',geometry_msgs.msg.Point,self.rangecb)
+        self.stop = False
+        self.planning = False
+
+
+    def rangecb(self, point):
+        if self.planning and point.z == 0:
+            rospy.loginfo('stop')
+            self.stop = True
+            self.move_start()
+            self.rangesub.unregister()
+
 
     def callback(self, targetarray):
         #callback that moves in a constrained path to anything published to /target_poses
         ##First, scale the position to be withing self.max_reach
         #new_target = self.project_point(targetarray.data)
-        new_target = self.project_point(targetarray)
-        target = PoseStamped()
-        target.header.stamp = rospy.Time.now()
-        target.header.frame_id = 'base'
-        target.pose.position = new_target
-        #change orientation to be upright
-        target.pose.orientation = self.start_pose.pose.orientation
-        #clear group info and set it again
-        self.group.clear_pose_targets()
-        # self.group.set_path_constraints(self.get_constraint())
-        self.group.set_planning_time(10)
-        # self.group.set_pose_target(target)
+        # rospy.loginfo(self.stop)
+        if not self.stop:
+            self.planning = True
 
-        ################### Try joint space planning
-        jt_state = JointState()
-        jt_state.header.stamp = rospy.Time.now()
-        angles = self.limb.joint_angles()
-        jt_state.name = list(angles.keys())
-        jt_state.position = list(angles.values())
-        jt_state.header.frame_id = 'base'
-        result = self.ik_srv([target],[jt_state],0)
-        angles = {}
-        i = 0
-        for name in result.joints[0].name:
-            angles[name] = result.joints[0].position[i]
-            i = i + 1
-        self.group.set_joint_value_target(angles)
+            new_target = self.project_point(targetarray)
+            target = PoseStamped()
+            target.header.stamp = rospy.Time.now()
+            target.header.frame_id = 'base'
+            target.pose.position = new_target
+            #change orientation to be upright
+            target.pose.orientation = self.start_pose.pose.orientation
+            #clear group info and set it again
+            self.group.clear_pose_targets()
+            # self.group.set_path_constraints(self.get_constraint())
+            self.group.set_planning_time(10)
+            # self.group.set_pose_target(target)
 
-        #plan and execute plan. If I find a way, I should add error checking her
-        #currently, if the plan fails, it just doesn't move and waits for another pose to be published
-        plan = self.group.plan()
-        self.group.execute(plan)
-        self.rate.sleep()
-        return
+            ################### Try joint space planning
+            jt_state = JointState()
+            jt_state.header.stamp = rospy.Time.now()
+            angles = self.limb.joint_angles()
+            jt_state.name = list(angles.keys())
+            jt_state.position = list(angles.values())
+            jt_state.header.frame_id = 'base'
+            result = self.ik_srv([target],[jt_state],0)
+            angles = {}
+            i = 0
+            for name in result.joints[0].name:
+                angles[name] = result.joints[0].position[i]
+                i = i + 1
+            self.group.set_joint_value_target(angles)
+
+            #plan and execute plan. If I find a way, I should add error checking her
+            #currently, if the plan fails, it just doesn't move and waits for another pose to be published
+            plan = self.group.plan()
+            self.group.execute(plan)
+            self.rate.sleep()
+            return
 
     def callback_tester(self, targetarray):
         #callback that moves in a constrained path to anything published to /target_poses
@@ -275,15 +291,13 @@ class MoveCup():
 
 def cup_callback(grabbedness):
     
-    if grabbedness and flag:
-        #slows down the robot path plan
-        Flag = False
-        rospy.loginfo('ready for orientation plan')      
-        mover.scale_movegroup()
-        mover.move_start()
-        rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
-        sub.unregister()
-        return
+    #slows down the robot path plan
+    rospy.loginfo('ready for orientation plan')      
+    mover.scale_movegroup()
+    mover.move_start()
+    rospy.Subscriber('target_poses', Float32MultiArray, mover.callback,queue_size=1)
+    sub.unregister()
+    return
 
 
 if __name__ == '__main__':

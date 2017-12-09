@@ -120,50 +120,6 @@ class MoveCup():
             self.rate.sleep()
             return
 
-    def callback_tester(self, targetarray):
-        #callback that moves in a constrained path to anything published to /target_poses
-        ##First, scale the position to be withing self.max_reach
-        #new_target = self.project_point(targetarray.data)
-        targetarray2 = targetarray
-        targetarray3 = targetarray
-        targetarray2.data = (targetarray.data[0]+.1,targetarray.data[1]+.1,targetarray.data[2]+.1)
-        targetarray3.data = (targetarray.data[0]+.15,targetarray.data[1]-.1,targetarray.data[2]-.1)
-        new_target = self.project_point(targetarray)
-        new_target2 = self.project_point(targetarray2)
-        new_target3 = self.project_point(targetarray3)
-        target = Pose()
-        target2 = Pose()
-        target3 = Pose()
-        target.position = new_target
-        target2.position = new_target2
-        target3.position = new_target3
-        #change orientation to be upright
-        target.orientation = self.start_pose.pose.orientation
-        #clear group info and set it again
-        self.group.clear_pose_targets()
-        self.group.set_path_constraints(self.get_constraint())
-        self.group.set_planning_time(10)
-        self.group.set_pose_target(target)
-        #plan and execute plan. If I find a way, I should add error checking her
-        #currently, if the plan fails, it just doesn't move and waits for another pose to be published
-        plan = self.group.plan()
-        self.group.set_pose_target(target2)
-        self.group.clear_path_constraints()
-        self.group.set_path_constraints(self.get_constraint())
-        plan2 = self.group.plan()
-        self.group.clear_path_constraints()
-        self.group.set_path_constraints(self.get_constraint())
-        self.group.set_pose_target(target3)
-        plan3 = self.group.plan()
-        self.group.execute(plan)
-        self.move_start()
-        self.group.execute(plan2)
-        self.move_start()
-        self.group.execute(plan3)
-        self.move_start()
-        self.rate.sleep()
-        return
-
     def scale_movegroup(self,vel = .9,acc = .9):
         #slows down baxters arm so we stop getting all those velocity limit errors
         self.group.set_max_velocity_scaling_factor(vel)
@@ -187,15 +143,6 @@ class MoveCup():
 
         # set joint state publishing to 100Hz
         self._pub_rate.publish(100)
-        return
-
-    def set_neutral(self):
-        """
-       Sets both arms back into a neutral pose.
-       """
-        print("Moving to neutral pose...")
-        self._left_arm.move_to_neutral()
-        print('Is neutral now')
         return
 
     def get_start_pose(self,point=[.9, 0.2, 0],rpy=[0, math.pi/2, 0]):

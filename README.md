@@ -37,7 +37,7 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 * [moveit_start.launch](https://github.com/tehwentzel/ME_495_Final/blob/master/launch/baxter_moveit_config.launch) will launch just the moveit setup for the robot, as well as the arm_mover.py node.  This file relies on having the baxter_moveit_config package installed to configure moveit to run with baxter. For more info, a tutorial for running moveit with baxter can be found (here)[http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial]
 
 ### Explaination of Main Nodes
-#### track_cup[ME_495_Final/src/track_cup.py]
+#### track_cup
 * This node uses open cv to detect red objects in the camera frame and publishes the centroid of the shape as x and y coordinates on to `cup_center` topic. This node also uses the IR sensor to measure the depth and puclishes it as th z coordinate.
 
 #### move_to_cup
@@ -49,6 +49,9 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 #### move_arm.py
 * This node is used to run the moveit path planning to follow the position of the hand of the user.
 * The node first waits for an std_msgs/Bool message to be sent to the /cup_grabbed topic to signify that the cup is grabbed.  Once this happens, a [callback](https://github.com/tehwentzel/ME_495_Final/blob/386c071c6f99d2dd3017174a3459c69b87a42177/src/move_arm.py#L276) will instantiate a subscriber to the /target_poses topics. and unsubscribe to the /cup_grabbed topic.  The FilterV2.py node will publish a Float32MultiArray message to /target_poses with the x,y,z coordiantes of the user's right hand int he Asus Xtion's frame.  The move_arm node will transform the point into baxter's planning frame and use Moveit to move the arm to that point.  This node will also look at the input into the hands depth sensor, and when it stops seeing the cup (which acts as a signal that the cup has been taken), it will move to a neutral position and turn off.
+
+#### release_cup.py
+* This node senses if the user is pulling the cup and open the gripper if a pull is sensed. As the robot is always made to move with the cup vertical, the force in the y direction of the end effector will never be negative and if it goes negative it will be due to a pull
 
 ### More Resources
 

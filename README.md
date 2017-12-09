@@ -1,9 +1,11 @@
-# ME_495_Final
 
-##### This package is was from the final project for ME 495: Embedded Systems in Robotics.  The goal of this package was to program Baxter to identify a red cup on a table, pick it up, and deliver it to the left hand of a user standing in from of it.  A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&feature=youtu.be)*
+ME495 Embedded Systems in Robotics: Final Project
+==============
+#### *Group 2: Suhail Sulaiman, Drew Warren, Andrew Wentzel, Zidong (Tom) Xiao, Kaiyang (Kevin) Zheng*
 
-### Members: 
-##### Suhail Sulaiman, Drew Warren, Andrew Wentzel, Zidong (Tom) Xiao, Kaiyang (Kevin) Zheng
+##  Overview of Project
+The objective of our project was to have Baxter locate and handle containers having liquid in it. At first Baxter will sweep the table to locate the container using the camera in the limb and the IR sensor. Once the container is located, baxter will grab it and then start tracking the right hand of the person standing in front of him. Then baxter will keep following the right hand of the person with the container until the cup is handed over to the user. Once the user pulls the cup baxter will sense the pull and release the gripper and the hand will go back to home position 
+A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&feature=youtu.be)*
 
 ### Installations
 

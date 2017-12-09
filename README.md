@@ -9,6 +9,8 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/RMCaAgLhMFE/0.jpg)](http://www.youtube.com/watch?v=RMCaAgLhMFE)
 
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/v5kqGhG_XYQ/0.jpg)](http://www.youtube.com/watch?v=v5kqGhG_XYQ)
+
 ### Installations
 
 #### Follow the instructions to install moveit! here: [moveit! for Baxter](http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial)

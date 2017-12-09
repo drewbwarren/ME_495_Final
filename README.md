@@ -53,8 +53,8 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 * This node is used to run the moveit path planning to follow the position of the hand of the user.
 * The node first waits for an std_msgs/Bool message to be sent to the /cup_grabbed topic to signify that the cup is grabbed.  Once this happens, a [callback](https://github.com/tehwentzel/ME_495_Final/blob/386c071c6f99d2dd3017174a3459c69b87a42177/src/move_arm.py#L276) will instantiate a subscriber to the /target_poses topics. and unsubscribe to the /cup_grabbed topic.  The FilterV2.py node will publish a Float32MultiArray message to /target_poses with the x,y,z coordiantes of the user's right hand int he Asus Xtion's frame.  The move_arm node will transform the point into baxter's planning frame and use Moveit to move the arm to that point.  This node will also look at the input into the hands depth sensor, and when it stops seeing the cup (which acts as a signal that the cup has been taken), it will move to a neutral position and turn off.
 
-#### release_cup
-* This node checks the wrench that the end effector experiences by checking the left arm's endpoint status topic. When you pull on the cup directly away from Baxter, that changes the y value of the end effector wrench. When that happens, Baxter lets go of the cup. This did not get implemented in the final result of the projects, but it worked in testing and it could still work together with the whole system.
+#### release_cup.py[https://github.com/tehwentzel/ME-495_Final/blob/master/src/release_cup.py]
+* This node senses if the user is pulling the cup and open the gripper if a pull is sensed. As the robot is always made to move with the cup vertical, the force in the y direction of the end effector will never be negative and if it goes negative it will be due to a pull
 
 ### More Resources
 

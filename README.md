@@ -32,6 +32,8 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 
 * Connect to Baxter.  A walthrough for that is avalible on the [rethink robotics website](http://sdk.rethinkrobotics.com/wiki/Workstation_Setup). A good primer on troubleshooting and available resources can be found on the [MSR website](http://nu-msr.github.io/embedded-course-site/notes/16_baxter_introduction.html).
 
+* [nu_skeletontracker.launch](https://github.com/NxRLab/skeletontracker_nu/blob/indigo/launch/nu_skeletontracker.launch) lauches the skeletontracker. It is recommended to launch the skeletontracker and the whole configuration seperately, since we found the Asus Xtion crashes more often when these two launch files are launched at the same time.
+
 * [roslaunch me_495_final grab.launch](https://github.com/tehwentzel/ME_495_Final/blob/master/launch/grab.launch) will launch the whole configureation
 
 * [moveit_start.launch](https://github.com/tehwentzel/ME_495_Final/blob/master/launch/baxter_moveit_config.launch) will launch just the moveit setup for the robot, as well as the arm_mover.py node.  This file relies on having the baxter_moveit_config package installed to configure moveit to run with baxter. For more info, a tutorial for running moveit with baxter can be found (here)[http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial]

@@ -38,9 +38,6 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 
 ### Explaination of Main Nodes
 
-#### track_cup
-* This node subscribes to the video from the camera in Baxter's left hand and finds the position of a red cup. OpenCV programming is used to do blob tracking to find the largest red oject in view of the camera and then the node publishes the x and y pixel positions of the centroid. The node also obtains data coming from the range finder in Baxter's hand and publishes that with the x and y positions.
-
 #### scan
 * This node places the arm in a position where the wrist and end effector are parallel to the table and the camera can see the surface. Joint left_w0 rotates slowly so that the camera can look at everything on the table. When the cup moves to the middle of the camera's view according to the x and y pixel positions from the track_cup node, the joint stops moving, and the node signals to the move_to_cup node to start its task.
 

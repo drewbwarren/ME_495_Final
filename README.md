@@ -38,6 +38,12 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 
 ### Explaination of Main Nodes
 
+#### track_cup
+* This node subscribes to the video from the camera in Baxter's left hand and finds the position of a red cup. OpenCV programming is used to do blob tracking to find the largest red oject in view of the camera and then the node publishes the x and y pixel positions of the centroid. The node also obtains data coming from the range finder in Baxter's hand and publishes that with the x and y positions.
+
+#### scan
+* This node places the arm in a position where the wrist and end effector are parallel to the table and the camera can see the surface. Joint left_w0 rotates slowly so that the camera can look at everything on the table. When the cup moves to the middle of the camera's view according to the x and y pixel positions from the track_cup node, the joint stops moving, and the node signals to the move_to_cup node to start its task.
+
 #### move_to_cup
 * Takes in the pose of the cup, runs that through Baxter's built in IK service, and the creates and executes a path plan to that pose using MoveIt!. So far, the MoveIt! planner for pose targets is not working, so this node solves the IK for the joints and puts that joint target into the MoveIt! planner for joint targets. It's still a little finicky and needs more development to make it more robust, especially calling the IK service and creating the path plan.
 
@@ -47,6 +53,9 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 #### move_arm.py
 * This node is used to run the moveit path planning to follow the position of the hand of the user.
 * The node first waits for an std_msgs/Bool message to be sent to the /cup_grabbed topic to signify that the cup is grabbed.  Once this happens, a [callback](https://github.com/tehwentzel/ME_495_Final/blob/386c071c6f99d2dd3017174a3459c69b87a42177/src/move_arm.py#L276) will instantiate a subscriber to the /target_poses topics. and unsubscribe to the /cup_grabbed topic.  The FilterV2.py node will publish a Float32MultiArray message to /target_poses with the x,y,z coordiantes of the user's right hand int he Asus Xtion's frame.  The move_arm node will transform the point into baxter's planning frame and use Moveit to move the arm to that point.  This node will also look at the input into the hands depth sensor, and when it stops seeing the cup (which acts as a signal that the cup has been taken), it will move to a neutral position and turn off.
+
+#### release_cup
+* This node checks the wrench that the end effector experiences by checking the left arm's endpoint status topic. When you pull on the cup directly away from Baxter, that changes the y value of the end effector wrench. When that happens, Baxter lets go of the cup. This did not get implemented in the final result of the projects, but it worked in testing and it could still work together with the whole system.
 
 ### More Resources
 

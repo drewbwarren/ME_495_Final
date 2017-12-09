@@ -1,6 +1,6 @@
 # ME_495_Final
 
-##### This package is was from the final project for ME 495: Embedded Systems in Robotics.  The goal of this package was to program Baxter to identify a red cup on a table, pick it up, and deliver it to the left hand of a user standing in from of it.
+##### This package is was from the final project for ME 495: Embedded Systems in Robotics.  The goal of this package was to program Baxter to identify a red cup on a table, pick it up, and deliver it to the left hand of a user standing in from of it.  A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&feature=youtu.be)*
 
 ### Members: 
 ##### Suhail Sulaiman, Drew Warren, Andrew Wentzel, Zidong (Tom) Xiao, Kaiyang (Kevin) Zheng
@@ -50,5 +50,3 @@
 * Anyone interested in constrained planning in moveit might be interested in looking into [using OMPL create an Approximation Manifold For Path Planning](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/constraints_approximation_database.html).  THis allows you to calculate and approximated sub-space of valid states to plan on for a set of constraints that is created when the node is run.  Requires using C++
 
 * An ongoing area of development in moveit is integrating [CHOMP](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/chomp_interface_tutorial.html) with Moveit.  CHOMP Uses optimization based path planning.  Using alternative path planning algorithms that allow a cost function based on the distance offset from the desired pose at any point would likely prove a better alternative to naive path planning or the default method of constrained planning used in Moveit.
-### Video Demo
-Please refer to this [video](https://drive.google.com/drive/folders/1px5vzHt1ewg4ES5YicfgGZbBv6ElgH1i) for the demo of this project

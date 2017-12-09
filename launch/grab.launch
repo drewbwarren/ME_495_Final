@@ -13,6 +13,8 @@
     <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
 	<node name="skeleton_filter" pkg="me_495_final" type="filterV2.py" />
 
+	<node pkg="tf" type="static_transfrom_publisher" name="kinect_transform" arg="0.095 0 0.815 0 1 0 0 /torso /openni_depth_optical_frame 100"/>
+
     <node name="cup_track" pkg="me_495_final" type="track_cup.py"/>
     <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
 
@@ -21,5 +23,7 @@
 
     <node name="grab" pkg="me_495_final" type="move_to_cup.py" output="screen"/>
     <param name ="move_group/trajectory_execution/allowed_start_tolerance" type="double" value="1" />
+
+    <!--node name="release" pkg="me_495_final" type="release_cup.py" /-->
 
 </launch>

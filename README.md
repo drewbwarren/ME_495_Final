@@ -37,19 +37,19 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 * [moveit_start.launch](https://github.com/tehwentzel/ME_495_Final/blob/master/launch/baxter_moveit_config.launch) will launch just the moveit setup for the robot, as well as the arm_mover.py node.  This file relies on having the baxter_moveit_config package installed to configure moveit to run with baxter. For more info, a tutorial for running moveit with baxter can be found (here)[http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial]
 
 ### Explaination of Main Nodes
-#### track_cup[ME_495_Final/src/track_cup.py]
+#### track_cup[https://github.com/tehwentzel/ME-495_Final/blob/master/src/track_cup.py]
 * This node uses open cv to detect red objects in the camera frame and publishes the centroid of the shape as x and y coordinates on to `cup_center` topic. This node also uses the IR sensor to measure the depth and puclishes it as th z coordinate.
 
-#### scan
+#### scan[https://github.com/tehwentzel/ME-495_Final/blob/master/src/scan.py]
 * This node places the arm in a position where the wrist and end effector are parallel to the table and the camera can see the surface. Joint left_w0 rotates slowly so that the camera can look at everything on the table. When the cup moves to the middle of the camera's view according to the x and y pixel positions from the track_cup node, the joint stops moving, and the node signals to the move_to_cup node to start its task.
 
-#### move_to_cup
+#### move_to_cup[https://github.com/tehwentzel/ME-495_Final/blob/master/src/move_to_cup.py]
 * Takes in the pose of the cup, runs that through Baxter's built in IK service, and the creates and executes a path plan to that pose using MoveIt!. So far, the MoveIt! planner for pose targets is not working, so this node solves the IK for the joints and puts that joint target into the MoveIt! planner for joint targets. It's still a little finicky and needs more development to make it more robust, especially calling the IK service and creating the path plan.
 
-#### filter_V2
+#### filter_V2[https://github.com/tehwentzel/ME-495_Final/blob/master/src/filter_V2.py]
 * This node reads the messages sent to the /skeletons topic, which holds the locations of the skeletons found by the skeletontracker_nu package.  It will filter the skeletons rank them based on how close they are and their angle off the center of the camera.  Once a main user is identified, it publishes the xyz values of the right hand to the /target_poses topics as a Floast32MultiArray
 
-#### move_arm.py
+#### move_arm.py[https://github.com/tehwentzel/ME-495_Final/blob/master/src/move_arm.py]
 * This node is used to run the moveit path planning to follow the position of the hand of the user.
 * The node first waits for an std_msgs/Bool message to be sent to the /cup_grabbed topic to signify that the cup is grabbed.  Once this happens, a [callback](https://github.com/tehwentzel/ME_495_Final/blob/386c071c6f99d2dd3017174a3459c69b87a42177/src/move_arm.py#L276) will instantiate a subscriber to the /target_poses topics. and unsubscribe to the /cup_grabbed topic.  The FilterV2.py node will publish a Float32MultiArray message to /target_poses with the x,y,z coordiantes of the user's right hand int he Asus Xtion's frame.  The move_arm node will transform the point into baxter's planning frame and use Moveit to move the arm to that point.  This node will also look at the input into the hands depth sensor, and when it stops seeing the cup (which acts as a signal that the cup has been taken), it will move to a neutral position and turn off.
 

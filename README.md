@@ -36,8 +36,6 @@
 #### grasp.py
 * is a very simple node to control the joint positions of Baxter's left arm. Starting from rest, the arm moves to three intermediate positions before moving to a plausible grasping position above the table. A better approach would be to use the `moveit_commander` to plan a path to the position of the cup and avoid the known obstacle of the table. I will try to do that next.
 
-#### ALSO OTHER NODES USED TO PICK UP THE CUP
-
 #### filter_V2
 * This node reads the messages sent to the /skeletons topic, which holds the locations of the skeletons found by the skeletontracker_nu package.  It will filter the skeletons rank them based on how close they are and their angle off the center of the camera.  Once a main user is identified, it publishes the xyz values of the right hand to the /target_poses topics as a Floast32MultiArray
 

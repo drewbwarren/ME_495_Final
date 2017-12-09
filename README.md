@@ -37,6 +37,8 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 * [moveit_start.launch](https://github.com/tehwentzel/ME_495_Final/blob/master/launch/baxter_moveit_config.launch) will launch just the moveit setup for the robot, as well as the arm_mover.py node.  This file relies on having the baxter_moveit_config package installed to configure moveit to run with baxter. For more info, a tutorial for running moveit with baxter can be found (here)[http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial]
 
 ### Explaination of Main Nodes
+#### track_cup[ME_495_Final/src/track_cup.py]
+* This node uses open cv to detect red objects in the camera frame and publishes the centroid of the shape as x and y coordinates on to `cup_center` topic. This node also uses the IR sensor to measure the depth and puclishes it as th z coordinate.
 
 #### scan
 * This node places the arm in a position where the wrist and end effector are parallel to the table and the camera can see the surface. Joint left_w0 rotates slowly so that the camera can look at everything on the table. When the cup moves to the middle of the camera's view according to the x and y pixel positions from the track_cup node, the joint stops moving, and the node signals to the move_to_cup node to start its task.

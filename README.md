@@ -1,5 +1,7 @@
 # ME_495_Final
 
+##### This package is was from the final project for ME 495: Embedded Systems in Robotics.  The goal of this package was to program Baxter to identify a red cup on a table, pick it up, and deliver it to the left hand of a user standing in from of it.
+
 ### Members: 
 ##### Suhail Sulaiman, Drew Warren, Andrew Wentzel, Zidong (Tom) Xiao, Kaiyang (Kevin) Zheng
 

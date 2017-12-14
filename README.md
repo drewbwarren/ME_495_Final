@@ -1,5 +1,5 @@
 
-ME495 Embedded Systems in Robotics: Final Project
+ME495 Embedded Systems in Robotics: Baxter Butler 
 ==============
 #### *Group 2: Suhail Sulaiman, Drew Warren, Andrew Wentzel, Zidong (Tom) Xiao, Kaiyang (Kevin) Zheng*
 

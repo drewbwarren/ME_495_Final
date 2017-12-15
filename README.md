@@ -38,7 +38,7 @@ A short video can be found: *[Here](https://www.youtube.com/watch?v=RMCaAgLhMFE&
 
 * [moveit_start.launch](https://github.com/tehwentzel/ME_495_Final/blob/master/launch/baxter_moveit_config.launch) will launch just the moveit setup for the robot, as well as the arm_mover.py node.  This file relies on having the baxter_moveit_config package installed to configure moveit to run with baxter. For more info, a tutorial for running moveit with baxter can be found (here)[http://sdk.rethinkrobotics.com/wiki/MoveIt_Tutorial]
 
-### Explaination of Main Nodes
+### Main Nodes
 #### [track_cup](https://github.com/tehwentzel/ME-495_Final/blob/master/src/track_cup.py)
 * This node uses open cv to detect red objects in the camera frame and publishes the centroid of the shape as x and y coordinates on to `cup_center` topic. This node also uses the IR sensor to measure the depth and puclishes it as th z coordinate.
 
